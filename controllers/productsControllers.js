@@ -150,7 +150,6 @@ const getProductByBrand = async (req, res) => {
     return res.status(400).json({ message: "Brand is required" })
   }
   const brand = req.params.brand
-  console.log(brand)
   const result = await Product.find({ brand }).exec()
   if (!result?.length) {
     return res
@@ -158,6 +157,26 @@ const getProductByBrand = async (req, res) => {
       .json({ message: "No product with that brand was found" })
   }
   res.status(200).json(result)
+}
+
+// @ desc get product by search
+// @route /GET /product/search
+// access public
+const searchProducts = async (req, res) => {
+  const query = req.params.query
+  const products = await Product.find()
+  const searchResults = products.filter(
+    (product) =>
+      product.title.toLowerCase().includes(query.toLowerCase()) ||
+      product.category.toLowerCase().includes(query.toLowerCase()) ||
+      product.description.toLowerCase().includes(query.toLowerCase())
+  )
+  if (!searchResults?.length) {
+    return res
+      .status(404)
+      .json({ message: `No results for ${query} was found` })
+  }
+  res.status(200).json(searchResults)
 }
 
 module.exports = {
@@ -170,4 +189,5 @@ module.exports = {
   deleteProduct,
   getProductBrands,
   getProductCategories,
+  searchProducts,
 }
