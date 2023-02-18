@@ -106,33 +106,40 @@ const logout = async (req, res) => {
 }
 
 const refresh = async (req, res) => {
-  const cookies = req.cookies
-  if (!cookies?.jwt)
+ const cookies = req.cookies
+if (!cookies?.jwt)
+  return res.status(401).json({ message: "Please Login Again" })
+
+const refreshToken = cookies.jwt
+try {
+  const decoded = await jwt.verifyAsync(refreshToken, process.env.REFRESH_TOKEN_SECRET)
+  const foundUser = await User.findById(decoded.user).exec()
+
+  if (!foundUser) {
     return res.status(401).json({ message: "Please Login Again" })
+  }
 
-  const refreshToken = cookies.jwt
-    const decoded = await jwt.verifyAsync(
-      refreshToken,
-      process.env.REFRESH_TOKEN_SECRET
-    )
-    const foundUser = await User.findById(decoded.user).exec()
-
-    if (!foundUser) {
-      return res.status(401).json({ message: "Please Login Again" })
-    }
-
-    const accessToken = jwt.sign(
-      {
-        UserInfo: {
-          user: foundUser._id,
-          role: foundUser.role,
-        },
+  const accessToken = jwt.sign(
+    {
+      UserInfo: {
+        user: foundUser._id,
+        role: foundUser.role,
       },
-      process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: "15m" }
-    )
+    },
+    process.env.ACCESS_TOKEN_SECRET,
+    { expiresIn: "15m" }
+  )
 
-    res.json({ accessToken })
+  res.json({ accessToken })
+} catch (err) {
+  if (err.name === 'TokenExpiredError') {
+    return res.status(403).json({ message: "Your session has expired" })
+  }
+
+  console.error(err)
+  res.status(500).json({ message: "Internal Server Error" })
+}
+
 }
 
 module.exports = {
