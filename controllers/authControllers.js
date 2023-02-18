@@ -109,31 +109,30 @@ const refresh = async (req, res) => {
   const cookies = req.cookies
   if (!cookies?.jwt)
     return res.status(401).json({ message: "Please Login Again" })
+
   const refreshToken = cookies.jwt
-  jwt.verify(
-    refreshToken,
-    process.env.REFRESH_TOKEN_SECRET,
-    async (err, decoded) => {
-      if (err)
-        return res.status(403).json({ message: "Your session has expired" })
-      const foundUser = await User.findById(decoded.user).exec()
-      if (!foundUser) {
-        return res.status(401).json({ message: "Please Login Again" })
-      }
-      const accessToken = jwt.sign(
-        {
-          UserInfo: {
-            user: foundUser._id,
-            role: foundUser.role,
-            name: foundUser.name,
-          },
-        },
-        process.env.ACCESS_TOKEN_SECRET,
-        { expiresIn: "7d" }
-      )
-      res.json({ accessToken })
+    const decoded = await jwt.verifyAsync(
+      refreshToken,
+      process.env.REFRESH_TOKEN_SECRET
+    )
+    const foundUser = await User.findById(decoded.user).exec()
+
+    if (!foundUser) {
+      return res.status(401).json({ message: "Please Login Again" })
     }
-  )
+
+    const accessToken = jwt.sign(
+      {
+        UserInfo: {
+          user: foundUser._id,
+          role: foundUser.role,
+        },
+      },
+      process.env.ACCESS_TOKEN_SECRET,
+      { expiresIn: "15m" }
+    )
+
+    res.json({ accessToken })
 }
 
 module.exports = {
