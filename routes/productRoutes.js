@@ -28,8 +28,6 @@ router.get("/categories", productController.getProductCategories)
 router.get("/brands", productController.getProductBrands)
 router.get("/categories/:category", productController.getProductByCategory)
 router.get("/brands/:brand", productController.getProductByBrand)
-router.get("/search/:query", productController.searchProducts)
-
-router.get("/:id", productController.getProductById)
+router.get("/search", productController.searchProducts)
 
 module.exports = router

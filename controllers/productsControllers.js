@@ -1,13 +1,11 @@
 const Product = require("../model/Product")
+const User = require("../model/User")
 
 // @ desc get all products
 // @route /GET /product
 // access public
 const getAllProducts = async (req, res) => {
-  const result = await Product.find().lean()
-  if (!result?.length) {
-    return res.status(404).json({ message: "No products were found" })
-  }
+  const result = await Product.find().select("-reviews")
   res.status(200).json(result)
 }
 
@@ -27,7 +25,12 @@ const deleteProduct = async (req, res) => {
     return res.status(404).json({ message: "No product was found" })
   }
   const result = await product.deleteOne()
-
+  const users = await User.find({ "cart.product": id })
+  users.forEach((user) => {
+    const item = user.cart.find((item) => item.product == id)
+    user.cart.id(item._id).remove()
+    user.save()
+  })
   if (!result) {
     return res.status(400).json({ message: "Invalid Id" })
   }
@@ -48,7 +51,8 @@ const updateProduct = async (req, res) => {
     !category ||
     !brand ||
     !id ||
-    !discount
+    !discount ||
+    !images
   ) {
     return res.status(400).json({ message: "All fields are required" })
   }
@@ -64,9 +68,7 @@ const updateProduct = async (req, res) => {
   product.category = category
   product.brand = brand
   product.discount = discount
-  if (images && Array.isArray(images)) {
-    product.images = images
-  }
+  if (images?.length) product.images = images
   await product.save()
   res.status(200).json({ message: `${product.title} updated` })
 }
@@ -100,27 +102,15 @@ const createNewProduct = async (req, res) => {
   res.status(201).json({ message: `New product ${newProduct.title}` })
 }
 
-// @ desc get product by  id
-// @route /GET /product/:id
-// access public
-const getProductById = async (req, res) => {
-  if (!req?.params?.id) {
-    return res.status(400).json({ message: "id is required" })
-  }
-  const id = req.params.id
-  const result = await Product.findById(id)
-  if (!result) {
-    return res.status(400).json({ message: "Product not found" })
-  }
-  res.status(200).json(result)
-}
-
 // @ desc get product by category
 // @route /GET /product/categories/ :category
 // access public
 const getProductByCategory = async (req, res) => {
   if (!req?.params?.category) {
-    return res.status(400).json({ message: "The category is required" })
+    return res
+      .status(400)
+      .json({ message: "The category is required" })
+      .select("-reviews")
   }
   const category = req.params.category
   const result = await Product.find({ category }).exec()
@@ -147,10 +137,13 @@ const getProductBrands = async (req, res) => {
 // access public
 const getProductByBrand = async (req, res) => {
   if (!req?.params?.brand) {
-    return res.status(400).json({ message: "Brand is required" })
+    return res
+      .status(400)
+      .json({ message: "Brand is required" })
+      .select("-reviews")
   }
   const brand = req.params.brand
-  const result = await Product.find({ brand }).exec()
+  const result = await Product.find({ brand }).select("-reviews").exec()
   if (!result?.length) {
     return res
       .status(400)
@@ -163,8 +156,8 @@ const getProductByBrand = async (req, res) => {
 // @route /GET /product/search
 // access public
 const searchProducts = async (req, res) => {
-  const query = req.params.query
-  const products = await Product.find()
+  const query = req.query.q
+  const products = await Product.find().select("-reviews")
   const searchResults = products.filter(
     (product) =>
       product.title.toLowerCase().includes(query.toLowerCase()) ||
@@ -185,7 +178,6 @@ module.exports = {
   getProductByBrand,
   getProductByCategory,
   createNewProduct,
-  getProductById,
   updateProduct,
   deleteProduct,
   getProductBrands,

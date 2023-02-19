@@ -6,8 +6,8 @@ const addReview = async (req, res) => {
   const { content } = req.body
   if (!content)
     return res.status(400).json({ message: "All fields are required" })
-  const sender = req.name
-  const newReview = req.reviews.push({
+  const sender = req.userId
+  req.product.reviews.push({
     sender,
     content,
   })
@@ -22,13 +22,13 @@ const addReview = async (req, res) => {
      }
 */
 const deleteReview = async (req, res) => {
-  if (req.selectedReview.sender !== req.name || req.role === 1960)
+  if (req.selectedReview.sender !== req.userId && req.role !== 1960)
     return res
       .status(401)
-      .json({ message: "You are not allowed to edit this review" })
+      .json({ message: "You are not allowed to delete this review" })
   await req.selectedReview.remove()
   await req.product.save()
-  res.sendStatus(200).json({ message: "Item deleted successfully" })
+  res.status(200).json({ message: "Item deleted successfully" })
 }
 /* 
      body={
@@ -40,7 +40,7 @@ const deleteReview = async (req, res) => {
 const editReview = async (req, res) => {
   const { content } = req.body
   if (!content) return res.sendStatus(400)
-  if (req.selectedReview.sender !== req.name || req.role !== 1960)
+  if (req.selectedReview.sender !== req.userId && req.role !== 1960)
     return res
       .status(401)
       .json({ message: "You are not allowed to edit this review" })
@@ -49,15 +49,13 @@ const editReview = async (req, res) => {
   res.status(200).json({ message: "Updated" })
 }
 /* 
-     body ={ 
+     params ={ 
           productId
      }
 */
 const getReviews = async (req, res) => {
-  const reviews = req.reviews
-  if (!reviews.length)
-    return res.status(404).json({ message: "No reviews found" })
-  res.status(200).json({ reviews })
+  const product = await req.product.populate("reviews.sender", "name -_id")
+  res.status(200).json(product.reviews)
 }
 
 module.exports = {

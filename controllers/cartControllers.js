@@ -1,25 +1,30 @@
 const getAll = async (req, res) => {
-  const cart = req.cart
-  if (!cart?.length)
-    return res.status(404).json({ message: "Your cart is Empty" })
-  res.status(200).json(cart)
+  const user = await req.user.populate(
+    "cart.product",
+    "-reviews -discount -description"
+  )
+  res.status(200).json(user.cart)
 }
 
 const addToCart = async (req, res) => {
-  const { title, image, quantity, price, source } = req.body
-  if (!title || !image || !quantity || !price || !source) {
+  const { product, quantity } = req.body
+  if (!product || !quantity) {
     return res.status(400).json({ message: "All fields are required" })
   }
-  const cart = req.cart
+  const cart = await req.cart
+  const existingItem = cart.find((item) => item.product == product)
+  if (existingItem) {
+    const foundItem = cart.id(existingItem._id)
+    foundItem.quantity += 1
+    const result = await req.user.save()
+    return res.status(201).json({ message: "Item has been added to your cart" })
+  }
   const newItem = await cart.push({
-    title,
-    image,
+    product,
     quantity,
-    price,
-    source,
   })
   await req.user.save()
-  res.sendStatus(201)
+  res.status(201).json({ message: "Item has been added to your cart" })
 }
 
 const deleteFromCart = async (req, res) => {

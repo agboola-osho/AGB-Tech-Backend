@@ -6,7 +6,6 @@ const reviewControllers = require("../controllers/reviewsControllers")
 
 router
   .route("/")
-  .get(helperMiddleware.findProductById, reviewControllers.getReviews)
   .post(
     verifyJWT,
     helperMiddleware.findUserById,
@@ -27,5 +26,11 @@ router
     helperMiddleware.findReviewById,
     reviewControllers.deleteReview
   )
+
+router.get(
+  "/:productId",
+  helperMiddleware.findProductById,
+  reviewControllers.getReviews
+)
 
 module.exports = router
