@@ -22,8 +22,8 @@ const addReview = async (req, res) => {
      }
 */
 const deleteReview = async (req, res) => {
-  if (req.selectedReview.sender !== req.userId && req.role !== 1960) {
-     return res
+  if (String(req.selectedReview.sender) !== req.userId && req.role !== 1960) {
+    return res
       .status(401)
       .json({ message: "You are not allowed to delete this review" })
   }
@@ -41,11 +41,10 @@ const deleteReview = async (req, res) => {
 const editReview = async (req, res) => {
   const { content } = req.body
   if (!content) return res.sendStatus(400)
-  if (req.selectedReview.sender !== req.userId && req.role !== 1960) {
-     return res
+  if (String(req.selectedReview.sender) !== req.userId && req.role !== 1960)
+    return res
       .status(401)
       .json({ message: "You are not allowed to edit this review" })
-  }
   req.selectedReview.content = content
   await req.product.save()
   res.status(200).json({ message: "Updated" })
@@ -56,7 +55,7 @@ const editReview = async (req, res) => {
      }
 */
 const getReviews = async (req, res) => {
-  const product = await req.product.populate("reviews.sender", "name -_id")
+  const product = await req.product.populate("reviews.sender", "name")
   res.status(200).json(product.reviews)
 }
 

@@ -6,8 +6,8 @@ const Product = require("../model/Product")
 const findUserById = async (req, res, next) => {
   const userId = req.userId
   const foundUser = await User.findById(userId)
-  console.log(foundUser)
   req.user = foundUser
+  req.name = foundUser.name
   req.cart = foundUser.cart
   next()
 }

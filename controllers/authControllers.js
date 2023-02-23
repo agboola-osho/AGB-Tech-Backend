@@ -80,32 +80,27 @@ const logout = async (req, res) => {
 
 const refresh = async (req, res) => {
   const cookies = req.cookies
-  if (!cookies?.jwt){
+  if (!cookies?.jwt)
     return res.status(401).json({ message: "Please Login Again" })
-  }
   const refreshToken = cookies.jwt
-  jwt.verify(
-    refreshToken,
-    process.env.REFRESH_TOKEN_SECRET,
-    (err, decoded) => {
-      if (err) return res.status(403).json({ message: "Please Login Again" })
-      const foundUser = User.findById(decoded.user).exec()
-      if (!foundUser) {
-        return res.status(401).json({ message: "Please Login Again" })
-      }
-      const accessToken = jwt.sign(
-        {
-          UserInfo: {
-            user: foundUser._id,
-            role: foundUser.role,
-          },
-        },
-        process.env.ACCESS_TOKEN_SECRET,
-        { expiresIn: "15m" }
-      )
-      res.json({ accessToken })
+  jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
+    if (err) return res.status(403).json({ message: "Please Login Again" })
+    const foundUser = User.findById(decoded.user).exec()
+    if (!foundUser) {
+      return res.status(401).json({ message: "Please Login Again" })
     }
-  )
+    const accessToken = jwt.sign(
+      {
+        UserInfo: {
+          user: foundUser._id,
+          role: foundUser.role,
+        },
+      },
+      process.env.ACCESS_TOKEN_SECRET,
+      { expiresIn: "15m" }
+    )
+    res.json({ accessToken })
+  })
 }
 
 const email = async (req, res) => {
@@ -185,12 +180,6 @@ const getUserDetails = async (req, res) => {
   res.status(200).json(foundUser)
 }
 
-const deleteAccount = async (req, res) => {
-  const id = req.userId
-  if (!id) return res.sendStatus(400)
-  await User.findByIdAndDelete(id)
-}
-
 module.exports = {
   signup,
   login,
@@ -200,5 +189,4 @@ module.exports = {
   verifyEmail,
   resetPassword,
   getUserDetails,
-  deleteAccount,
 }

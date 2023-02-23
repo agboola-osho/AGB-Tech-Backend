@@ -1,3 +1,3 @@
-const frontend = "https://agb-tech.onrender.com"
+const frontend = "http://localhost:3000"
 
 module.exports = frontend
