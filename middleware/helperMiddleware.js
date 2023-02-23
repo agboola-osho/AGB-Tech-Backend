@@ -7,7 +7,6 @@ const findUserById = async (req, res, next) => {
   const userId = req.userId
   const foundUser = await User.findById(userId)
   req.user = foundUser
-  req.name = foundUser.name
   req.cart = foundUser.cart
   next()
 }
