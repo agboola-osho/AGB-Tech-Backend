@@ -22,10 +22,11 @@ const addReview = async (req, res) => {
      }
 */
 const deleteReview = async (req, res) => {
-  if (req.selectedReview.sender !== req.userId && req.role !== 1960)
-    return res
+  if (req.selectedReview.sender !== req.userId && req.role !== 1960) {
+     return res
       .status(401)
       .json({ message: "You are not allowed to delete this review" })
+  }
   await req.selectedReview.remove()
   await req.product.save()
   res.status(200).json({ message: "Item deleted successfully" })
