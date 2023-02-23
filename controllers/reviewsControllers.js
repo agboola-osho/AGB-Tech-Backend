@@ -41,10 +41,11 @@ const deleteReview = async (req, res) => {
 const editReview = async (req, res) => {
   const { content } = req.body
   if (!content) return res.sendStatus(400)
-  if (req.selectedReview.sender !== req.userId && req.role !== 1960)
-    return res
+  if (req.selectedReview.sender !== req.userId && req.role !== 1960) {
+     return res
       .status(401)
       .json({ message: "You are not allowed to edit this review" })
+  }
   req.selectedReview.content = content
   await req.product.save()
   res.status(200).json({ message: "Updated" })
