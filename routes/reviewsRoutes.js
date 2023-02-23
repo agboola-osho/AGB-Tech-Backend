@@ -14,14 +14,12 @@ router
   )
   .patch(
     verifyJWT,
-    helperMiddleware.findUserById,
     helperMiddleware.findProductById,
     helperMiddleware.findReviewById,
     reviewControllers.editReview
   )
   .delete(
     verifyJWT,
-    helperMiddleware.findUserById,
     helperMiddleware.findProductById,
     helperMiddleware.findReviewById,
     reviewControllers.deleteReview
