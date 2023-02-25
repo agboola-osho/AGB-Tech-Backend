@@ -90,15 +90,15 @@ const refresh = async (req, res) => {
       return res.status(401).json({ message: "Please Login Again" })
     }
     const accessToken = jwt.sign(
-      {
-        UserInfo: {
-          user: foundUser._id,
-          role: foundUser.role,
-        },
+    {
+      UserInfo: {
+        user: foundUser._id,
+        role: foundUser.role,
       },
-      process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: "15m" }
-    )
+    },
+    process.env.ACCESS_TOKEN_SECRET,
+    { expiresIn: "15m" }
+  )
     res.json({ accessToken })
   })
 }
