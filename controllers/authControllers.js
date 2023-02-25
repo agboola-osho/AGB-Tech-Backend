@@ -83,9 +83,9 @@ const refresh = async (req, res) => {
   if (!cookies?.jwt)
     return res.status(401).json({ message: "Please Login Again" })
   const refreshToken = cookies.jwt
-  jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
+  jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, async (err, decoded) => {
     if (err) return res.status(403).json({ message: "Please Login Again" })
-    const foundUser = User.findById(decoded.user).exec()
+    const foundUser = await User.findById(decoded.user).exec()
     if (!foundUser) {
       return res.status(401).json({ message: "Please Login Again" })
     }
