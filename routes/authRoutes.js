@@ -18,7 +18,6 @@ router.patch("/verifyEmail", authController.verifyEmail)
 
 router.patch("/resetPwd", authController.resetPassword)
 
-router.use(verifyJWT)
 router.route("/user").get(verifyJWT, authController.getUserDetails)
 
 module.exports = router
