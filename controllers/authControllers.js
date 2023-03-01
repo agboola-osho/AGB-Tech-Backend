@@ -79,26 +79,26 @@ const logout = async (req, res) => {
 }
 
 const refresh = async (req, res) => {
-  if (!req.cookies?.jwt) {
+  if (!req.cookies.jwt) {
     return res.status(401).json({ message: "Please Login Again" })
   }
-  try {
-  const decoded = jwt.verify(req.cookies.jwt, process.env.REFRESH_TOKEN_SECRET)
-  const foundUser = await User.findById(decoded.user).lean().exec()
-  const accessToken = jwt.sign(
-    {
-      UserInfo: {
-        user: foundUser._id,
-        role: foundUser.role,
+  jwt.verify(req.cookies.jwt, process.env.REFRESH_TOKEN_SECRET, async (err, decoded)=> {
+    if(err) {
+      return res.status(401).json({ message: "Please Login Again" })
+    }
+    const foundUser = await User.findById(decoded.user).lean().exec()
+    const accessToken = jwt.sign(
+      {
+        UserInfo: {
+          user: foundUser._id,
+          role: foundUser.role,
+        },
       },
-    },
-    process.env.ACCESS_TOKEN_SECRET,
-    { expiresIn: "15m" }
-  )
-    res.status(200).json({ accessToken })
-} catch (err) {
-  return res.status(401).json({ message: "Please Login Again" })
-}
+      process.env.ACCESS_TOKEN_SECRET,
+      { expiresIn: "15m" }
+    )
+      res.status(200).json({ accessToken })
+ })
 }
 
 const email = async (req, res) => {
