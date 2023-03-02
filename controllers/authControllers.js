@@ -86,8 +86,11 @@ const refresh = async (req, res) => {
     if(err) {
       return res.status(401).json({ message: "Please Login Again" })
     }
-    const foundUser = await User.findById(decoded.user).lean().exec()
-    const accessToken = jwt.sign(
+    const foundUser = await User.findById(decoded.user).exec()
+    if(!foundUser){
+      return res.status(401).json({ message: "Please Login Again" })
+    } 
+    jwt.sign(
       {
         UserInfo: {
           user: foundUser._id,
@@ -95,9 +98,13 @@ const refresh = async (req, res) => {
         },
       },
       process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: "15m" }
+      { 
+        expiresIn: "15m" 
+      }, 
+      (err, encoded) => {
+        return res.status(200).json({ accessToken: encoded })
+      }
     )
-      res.status(200).json({ accessToken })
  })
 }
 
