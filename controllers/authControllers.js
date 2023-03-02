@@ -79,7 +79,7 @@ const logout = async (req, res) => {
 }
 
 const refresh = async (req, res) => {
-  if (!req.cookies.jwt) {
+  if (!req.cookies?.jwt) {
     return res.status(401).json({ message: "Please Login Again now" })
   }
   jwt.verify(req.cookies.jwt, process.env.REFRESH_TOKEN_SECRET, async (err, decoded)=> {
