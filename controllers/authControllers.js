@@ -80,10 +80,8 @@ const logout = async (req, res) => {
 
 const refresh = async (req, res) => {
   const cookies = req.cookies
-  if (!cookies?.jwt) {
-    return res.status(401).json({ message: "Please Login Again now" })
-  }
-  jwt.verify(cookies.jwt, process.env.REFRESH_TOKEN_SECRET, async (err, decoded)=> {
+  if (cookies?.jwt) {
+    jwt.verify(cookies.jwt, process.env.REFRESH_TOKEN_SECRET, async (err, decoded)=> {
     if(err) {
       return res.status(401).json({ message: "Please Login Again" })
     }
@@ -107,6 +105,8 @@ const refresh = async (req, res) => {
       }
     )
  })
+  } 
+  return res.status(401).json({ message: "Please Login Again" })
 }
 
 const email = async (req, res) => {
