@@ -105,8 +105,9 @@ const refresh = async (req, res) => {
       }
     )
  })
-  } 
-  return res.status(401).json({ message: "Please Login Again" })
+ } else {
+     return res.status(401).json({ message: "Please Login Again" })
+ } 
 }
 
 const email = async (req, res) => {
