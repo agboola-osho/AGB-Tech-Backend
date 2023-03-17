@@ -1,3 +1,3 @@
-const allowedOrigins = ["https://agb-tech.onrender.com", "https://agb-tech.vercel.app"]
+const allowedOrigins = ["https://agb-tech.onrender.com"]
 
 module.exports = allowedOrigins
