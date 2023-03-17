@@ -7,7 +7,7 @@
     "dev": "nodemon server",
     "start": "node server.js"
   },
-  "author": "",
+  "author": "Abdulrahman Agboola-Osho",
   "license": "ISC",
   "devDependencies": {
     "nodemon": "^2.0.20"
