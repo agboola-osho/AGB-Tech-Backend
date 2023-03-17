@@ -2,10 +2,10 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "backend of tfs store",
-  "main": "server.js",
+  "main": "index.js",
   "scripts": {
-    "dev": "nodemon server",
-    "start": "node server.js"
+    "dev": "nodemon index",
+    "start": "node index.js"
   },
   "author": "Abdulrahman Agboola-Osho",
   "license": "ISC",
