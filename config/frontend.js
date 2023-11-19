@@ -1,3 +1,3 @@
-const frontend = "https://agb-tech.onrender.com"
+const frontend = "https://agb-tech.vercel.app"
 
 module.exports = frontend
