@@ -115,6 +115,7 @@ const email = async (req, res) => {
       .json({ message: "No user with that email was found" })
   const transporter = nodemailer.createTransport({
     service: "gmail",
+    host: "smtp.gmail.com",
     auth: {
       user: process.env.EMAIL,
       pass: process.env.PASS,
