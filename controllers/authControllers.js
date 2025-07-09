@@ -147,8 +147,9 @@ const email = async (req, res) => {
           `${frontend}/${operation}?token=${encoded}`
         ),
       })
-      if (error) {
+      if (err) {
         res.status(500).json({message: "Email not sent, something went wrong"})
+        console.log(err)
       }
       else {
          res.status(200).json({ message: "Email sent" })
